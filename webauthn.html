@@ -1,0 +1,70 @@
+<html>
+ <head>
+  <script>
+    function enroll() {
+
+	var makeCredentialOptions = {
+  		"authenticatorSelection": {
+    			//"authenticatorAttachment": "cross-platform",
+    			  "requireResidentKey": true,
+    			  "userVerification": "preferred"
+  		},
+  		"challenge": null,
+  		"pubKeyCredParams": [{
+    			  "type": "public-key",
+    			  "alg": -7
+  			},
+  			{
+    			  "type": "public-key",
+  			  "alg": -257,
+  		}],
+  		"rp": {
+  			  "id":"jasleennuno-okta.github.io",
+  			  "name":"Okta"
+  		},
+  		"timeout":60000,
+  		"user": {
+  		  "displayName":"ycao",
+  		  "id": null,
+  		  "name":"yuming.cao@okta.com"
+  		}
+	}
+ 
+	var challenge = "";
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+ 
+	for (var i = 0; i < 24; i++)
+  		challenge += chars.charAt(Math.floor(Math.random() * chars.length));
+ 
+	makeCredentialOptions.challenge = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
+	makeCredentialOptions.user.id = Uint8Array.from(challenge)
+ 
+	navigator.credentials.create({
+    		publicKey: makeCredentialOptions
+		}).then(function (newCredential) {
+    		console.log("PublicKeyCredential Created");
+    		console.log(newCredential);
+		}).catch(function (err) {
+    		console.log(err);
+	});
+        
+    }
+    function verify() {
+	var options = {
+  		challenge: new Uint8Array(32),
+  		timeout: 30000  // 30 sec
+	};
+ 
+	navigator.credentials.get({ "publicKey": options }).then(function (assertion) {
+    		console.log(assertion);
+		}).catch(function (err) {
+    		console.log(err);
+		});    
+    }
+  </script>
+ </head>
+ <body>
+  <input type="button" name="enroll" value="enroll" onclick="enroll()">
+  <input type="button" name="verify" value="verify" onclick="verify()">
+ </body>
+</html>
